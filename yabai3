@@ -1,0 +1,130 @@
+#!/bin/zsh
+
+typeset -A stack_dir=(
+  "south" "stack.next"
+  "north" "stack.prev"
+)
+
+typeset -A stack_wrap=(
+  "south" "stack.first"
+  "north" "stack.last"
+)
+
+typeset -A opposite=(
+  "east"  "west"
+  "west"  "east"
+  "north" "south"
+  "south" "north"
+)
+
+alias yqww='yabai -m query --windows --window'
+alias ytf2='yabai -m window --toggle float && yabai -m window --toggle float'
+
+err() {
+  echo "yabai3: $1"; exit 1
+}
+
+sidx() {
+  echo $(yqww $@ | jq '."stack-index"')
+}
+
+focus() {
+  local dir=$1
+
+  case $dir in
+    west|east)
+      yabai -m window --focus $dir || \
+        yabai -m display --focus $dir
+      ;;
+    north|south)
+      yabai -m window --focus $stack_dir[$dir] || \
+        yabai -m window --focus $dir || \
+        yabai -m window --focus $stack_wrap[$dir]
+      ;;
+    *)
+      err "focus: unknown direction ${dir}"
+  esac
+}
+
+fullscreen-toggle() {
+  yabai -m space --layout $(yabai -m query --spaces --space | jq -r 'if .type == "bsp" then "stack" else "bsp" end')
+}
+
+stack-leave() {
+  yabai -m window --insert $1 && ytf2
+}
+
+stack-enter() {
+  yabai -m window $1 --stack $opposite[$1]
+}
+
+move() {
+  local dir=$1
+
+  if [[ $(sidx) -gt 0 ]]; then
+    # if in stack, north/south directions should move within until hitting border
+    if [[ $dir == (#s)(south|north) ]]; then
+      yabai -m window --swap $stack_dir[$dir] && return
+    fi
+    # otherwise, leave
+    stack-leave $dir
+  elif [ $(sidx $dir) -gt 0 ]; then
+    # if there's a stack, enter
+    stack-enter $dir
+  else
+    # otherwise, swap or move to next display
+    yabai -m window --swap $dir || \
+      (yabai -m window --display $dir && yabai -m display --focus $dir)
+  fi
+}
+
+resize() {
+  (( $3 )) || err "resize: scale factor not a number: $3"
+
+  case $1 in
+    shrink) local s=-1 ;;
+    grow) local s=1 ;;
+    *) err "resize: unknown scale: $1" ;;
+  esac
+
+  local r=$(( $s * $3 ))
+
+  case $2 in
+    width)
+      yabai -m window --resize right:$r:0 || \
+        yabai -m window --resize left:$((-($r))):0
+      ;;
+    height)
+      yabai -m window --resize bottom:0:$r || \
+        yabai -m window --resize top:0:$((-($r)))
+      ;;
+    *)
+      err "resize: unknown orientation: $2"
+      ;;
+  esac
+}
+
+# main
+case $1 in
+  focus)
+    focus $2
+    ;;
+  move)
+    move $2
+    ;;
+  stack-leave)
+    stack-leave $2
+    ;;
+  stack-enter)
+    stack-enter $2
+    ;;
+  fullscreen-toggle)
+    fullscreen-toggle
+    ;;
+  resize)
+    resize $2 $3 $4
+    ;;
+  *)
+    err "unknown command: $1"
+    ;;
+esac
