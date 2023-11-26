@@ -46,7 +46,7 @@ focus() {
   esac
 }
 
-fullscreen-toggle() {
+layout-toggle() {
   yabai -m space --layout $(yabai -m query --spaces --space | jq -r 'if .type == "bsp" then "stack" else "bsp" end')
 }
 
@@ -68,7 +68,7 @@ move() {
     fi
     # otherwise, leave
     stack-leave $dir
-  elif [ $(sidx $dir) -gt 0 ]; then
+  elif [[ $(sidx $dir) -gt 0 ]]; then
     # if there's a stack, enter
     stack-enter $dir
   else
@@ -118,8 +118,8 @@ case $1 in
   stack-enter)
     stack-enter $2
     ;;
-  fullscreen-toggle)
-    fullscreen-toggle
+  layout-toggle)
+    layout-toggle
     ;;
   resize)
     resize $2 $3 $4

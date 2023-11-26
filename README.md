@@ -5,13 +5,13 @@ It's a simple `zsh` script.
 
 ## Features
 
-**yabai3** provides a few commands that imitates the way i3 behaves under the same action, but uses `yabai` to accomplish the intended effects.
+**yabai3** provides a few commands that imitate the way i3 behaves under the same action, but uses `yabai` to accomplish the intended effects.
 In the following list of available commands, `<dir>` refers to any yabai direction `(north|west|east|south)`.
 
 * `yabai3 focus <dir>` -- move focus to window or screen in the given direction. It also cycles through stacks.
 * `yabai3 move <dir>` -- move focused window in the given direction.
   It enters and leaves stacks, and also moves to adjacent displays.
-* `yabai3 fullscreen-toggle` -- toggle between `stack` and `bsp` display layout, imitating i3's fullscreen toggle behavior.
+* `yabai3 layout-toggle` -- toggle between `stack` and `bsp` display layout.
 * `yabai3 resize (shrink|grow) (width|height) <px>` -- shrink/grow the width/height of the focused window by `<px>` pixels.
 * `yabai3 stack-(enter|leave) <dir>` -- enter/leave a stack in the given direction with the focused window.
   These are also used internally in the `move` command, and can be used themselves for more specific stack management.

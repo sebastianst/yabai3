@@ -7,8 +7,8 @@ alt - w : yabai -m window --close
 # balance windows - 0x18 = equal
 alt - 0x18 : yabai -m space --balance
 
-# better fullscreen by stack/bsp toggle
-alt - f : yabai3 fullscreen-toggle
+# toggle window fullscreen
+alt - f : yabai -m window --toggle zoom-fullscreen
 
 # toggle window native fullscreen
 alt + shift - f : yabai -m window --toggle native-fullscreen
